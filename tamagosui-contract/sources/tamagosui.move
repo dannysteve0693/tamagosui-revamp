@@ -107,13 +107,13 @@ public struct PetAccessory has key, store {
     image_url: String
 }
 
-public struct PetStats has store {
+public struct PetStats has store, drop {
     energy: u8,
     happiness: u8,
     hunger: u8,
 }
 
-public struct PetGameData has store {
+public struct PetGameData has store, drop {
     coins: u64,
     experience: u64,
     level: u8,
@@ -339,6 +339,11 @@ public entry fun let_pet_sleep(pet: &mut Pet, clock: &Clock) {
     pet.image_url = string::utf8(PET_SLEEP_IMAGE_URL);
 
     emit_action(pet, b"started_sleeping");
+}
+
+public entry fun release_pet_to_wild(pet: Pet) {
+    let Pet { id, name: _, image_url: _, adopted_at: _, stats: _, game_data: _ } = pet;
+    object::delete(id); 
 }
 
 public entry fun wake_up_pet(pet: &mut Pet, clock: &Clock) {

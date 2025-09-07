@@ -10,6 +10,7 @@ type ActionButtonProps = {
   isPending: boolean;
   label: string;
   icon: ReactNode;
+  newClass?: string;
 };
 
 export function ActionButton({
@@ -18,12 +19,13 @@ export function ActionButton({
   isPending,
   label,
   icon,
+  newClass
 }: ActionButtonProps) {
   return (
     <Button
       onClick={onClick}
       disabled={disabled}
-      className="w-full cursor-pointer"
+      className={`w-full cursor-pointer text-sm md:text-base ${newClass}`}
     >
       {isPending ? (
         <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />

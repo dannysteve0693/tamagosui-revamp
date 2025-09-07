@@ -11,7 +11,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen flex flex-col bg-secondary">
       <Header />
-      <main className="flex-grow flex items-center justify-center p-4 pt-24">
+      <main className="flex-grow flex items-center justify-center p-4 pt-24 bg-[url(https://forums.terraria.org/index.php?attachments/wiki-background-jpg.21916/)] bg-cover">
         {!currentAccount ? (
           <div className="text-center p-8 border-4 border-primary bg-background shadow-[8px_8px_0px_#000]">
             <h2 className="text-4xl uppercase">Please Connect Wallet</h2>
