@@ -11,6 +11,8 @@ import {
   BriefcaseIcon,
   ZapIcon,
   ChevronUpIcon,
+  CirclePlus,
+  SkipForward
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -37,6 +39,9 @@ import { useMutateFeedPet } from "@/hooks/useMutateFeedPet";
 import { useMutateLetPetSleep } from "@/hooks/useMutateLetPetSleep";
 import { useMutatePlayWithPet } from "@/hooks/useMutatePlayWithPet";
 import { useMutatePlayAndFeedPet } from "@/hooks/useMutatePlayAndFeedPet";
+import { useMutatePlayAndFeedPetWithTransaction } from "@/hooks/useMutatePlayAndFeedPetWithTransaction";
+import { useMutateGenerateCoinsWithoutHungerOrTired } from "@/hooks/useMutateGenerateCoinsWithoutHungerOrTired";
+import { useMutateGenerateOneHundredCoins } from "@/hooks/useMutateGenerateOneHundredCoins";
 import { useMutateWakeUpPet } from "@/hooks/useMutateWakeUpPet";
 import { useMutateWorkForCoins } from "@/hooks/useMutateWorkForCoins";
 import { useQueryGameBalance } from "@/hooks/useQueryGameBalance";
@@ -60,6 +65,17 @@ export default function PetComponent({ pet }: PetDashboardProps) {
     useMutatePlayWithPet();
   const { mutate: mutatePlayAndFeedPet, isPending: isPlayAndFeed } =
     useMutatePlayAndFeedPet();
+
+  const {
+    mutate: mutatePlayAndFeedPetWithTransaction,
+    isPending: isMutatePlayAndFeedPetWithTransaction } = useMutatePlayAndFeedPetWithTransaction();
+
+  const { mutate: mutateGenerateCoinsWithoutHungerAndTired, isPending: isGenerateCoinsWithtoutHungerOrTired } =
+    useMutateGenerateCoinsWithoutHungerOrTired();
+  const { mutate: mutateGenerateOneHundredCoins, isPending: isGenerateOneHundredCoins } =
+    useMutateGenerateOneHundredCoins();
+
+
   const { mutate: mutateWorkForCoins, isPending: isWorking } =
     useMutateWorkForCoins();
 
@@ -113,7 +129,10 @@ export default function PetComponent({ pet }: PetDashboardProps) {
   // --- Client-side UI Logic & Button Disabling ---
   // `isAnyActionPending` prevents the user from sending multiple transactions at once.
   const isAnyActionPending =
-    isFeeding || isPlaying || isSleeping || isWorking || isLevelingUp || isPlayAndFeed;
+    isFeeding || isPlaying || isSleeping ||
+    isWorking || isLevelingUp || isPlayAndFeed ||
+    isMutatePlayAndFeedPetWithTransaction || isGenerateCoinsWithtoutHungerOrTired ||
+    isGenerateOneHundredCoins;
 
   // These `can...` variables mirror the smart contract's rules (`assert!`) on the client-side.
   const canFeed =
@@ -232,8 +251,36 @@ export default function PetComponent({ pet }: PetDashboardProps) {
               disabled={!canPlay || isAnyActionPending}
               isPending={isPlaying}
               label="Feed and Play"
-              icon={<PlayIcon />}
+              icon={<SkipForward />}
             />
+            <ActionButton
+              onClick={() => mutatePlayAndFeedPetWithTransaction({ petId: pet.id })}
+              disabled={!canPlay || isAnyActionPending}
+              isPending={isMutatePlayAndFeedPetWithTransaction}
+              label="Feed & Play w/ TB"
+              icon={<SkipForward />}
+            />
+            <div className="col-span-2">
+              <ActionButton
+                onClick={() => mutateGenerateCoinsWithoutHungerAndTired({ petId: pet.id })}
+                disabled={!canPlay || isAnyActionPending}
+                isPending={isGenerateCoinsWithtoutHungerOrTired}
+                label="Generate Coin Without Hunger or Tired"
+                icon={<CirclePlus />}
+              />
+
+            </div>
+            <div className="col-span-2">
+              <ActionButton
+                onClick={() => mutateGenerateOneHundredCoins({ petId: pet.id })}
+                disabled={!canPlay || isAnyActionPending}
+                isPending={isGenerateCoinsWithtoutHungerOrTired}
+                label="Generate Free 100 Coins"
+                icon={<CirclePlus />}
+              />
+
+            </div>
+
             <div className="col-span-2">
               <ActionButton
                 onClick={() => mutateWorkForCoins({ petId: pet.id })}
@@ -242,6 +289,7 @@ export default function PetComponent({ pet }: PetDashboardProps) {
                 label="Work"
                 icon={<BriefcaseIcon />}
               />
+
             </div>
           </div>
           <div className="col-span-2 pt-2">

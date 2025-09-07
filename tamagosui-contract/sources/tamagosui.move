@@ -308,6 +308,28 @@ public entry fun work_for_coins(pet: &mut Pet) {
     emit_action(pet, b"worked");
 }
 
+public entry fun generate_coins_without_hunger_or_tired(pet: &mut Pet) {
+    assert!(!is_sleeping(pet), E_PET_IS_ASLEEP);
+
+    let gb = get_game_balance();
+
+    pet.game_data.coins = pet.game_data.coins + gb.work_coins_gain;
+    pet.game_data.experience = pet.game_data.experience + gb.work_experience_gain;
+
+    emit_action(pet, b"generate_coins_without_hunger_or_tired");
+}
+
+public entry fun generate_one_hundred_coins(pet: &mut Pet) {
+    assert!(!is_sleeping(pet), E_PET_IS_ASLEEP);
+
+    let gb = get_game_balance();
+
+    pet.game_data.coins = pet.game_data.coins + 100;
+    pet.game_data.experience = pet.game_data.experience + gb.work_experience_gain;
+
+    emit_action(pet, b"generate_one_hundred_coins");
+}
+
 public entry fun let_pet_sleep(pet: &mut Pet, clock: &Clock) {
     assert!(!is_sleeping(pet), E_PET_IS_ALREADY_ASLEEP);
 
