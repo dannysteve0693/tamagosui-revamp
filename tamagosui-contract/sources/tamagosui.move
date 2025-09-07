@@ -247,6 +247,40 @@ public entry fun play_with_pet(pet: &mut Pet) {
     emit_action(pet, b"played");
 }
 
+public entry fun play_and_feed_pet(pet: &mut Pet) {
+    assert!(!is_sleeping(pet), E_PET_IS_ASLEEP);
+
+    let gb = get_game_balance();
+
+    assert!(pet.stats.hunger < gb.max_stat, E_PET_NOT_HUNGRY);
+    assert!(pet.game_data.coins >= gb.feed_coins_cost, E_NOT_ENOUGH_COINS);
+
+    assert!(pet.stats.energy >= gb.play_energy_loss, E_PET_TOO_TIRED);
+    assert!(pet.stats.hunger >= gb.play_hunger_loss, E_PET_TOO_HUNGRY);
+
+    // pet fed
+    pet.game_data.coins = pet.game_data.coins - gb.feed_coins_cost;
+    pet.game_data.experience = pet.game_data.experience + gb.feed_experience_gain;
+    pet.stats.hunger = if (pet.stats.hunger + gb.feed_hunger_gain > gb.max_stat)
+        gb.max_stat 
+    else 
+        pet.stats.hunger + gb.feed_hunger_gain;
+
+
+    // pet play
+    pet.stats.energy = pet.stats.energy - gb.play_energy_loss;
+    pet.stats.hunger = pet.stats.hunger - gb.play_hunger_loss;
+    pet.game_data.experience = pet.game_data.experience + gb.play_experience_gain;
+    pet.stats.happiness = if (pet.stats.happiness + gb.play_happiness_gain > gb.max_stat) 
+        gb.max_stat 
+    else 
+        pet.stats.happiness + gb.play_happiness_gain;
+
+
+    emit_action(pet, b"fed");
+    emit_action(pet, b"played");
+}
+
 public entry fun work_for_coins(pet: &mut Pet) {
     assert!(!is_sleeping(pet), E_PET_IS_ASLEEP);
 
@@ -421,7 +455,7 @@ fun update_pet_image(pet: &mut Pet) {
 }
 
 // === View Functions ===
-public fun get_pet_name(pet: &Pet): String { pet.name }
+public fun get_pet_name(pet: &0x0::tamagosui::Pet): String { pet.name }
 public fun get_pet_adopted_at(pet: &Pet): u64 { pet.adopted_at }
 public fun get_pet_coins(pet: &Pet): u64 { pet.game_data.coins }
 public fun get_pet_experience(pet: &Pet): u64 { pet.game_data.experience }

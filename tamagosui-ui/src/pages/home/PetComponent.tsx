@@ -36,6 +36,7 @@ import { useMutateCheckAndLevelUp } from "@/hooks/useMutateCheckLevel";
 import { useMutateFeedPet } from "@/hooks/useMutateFeedPet";
 import { useMutateLetPetSleep } from "@/hooks/useMutateLetPetSleep";
 import { useMutatePlayWithPet } from "@/hooks/useMutatePlayWithPet";
+import { useMutatePlayAndFeedPet } from "@/hooks/useMutatePlayAndFeedPet";
 import { useMutateWakeUpPet } from "@/hooks/useMutateWakeUpPet";
 import { useMutateWorkForCoins } from "@/hooks/useMutateWorkForCoins";
 import { useQueryGameBalance } from "@/hooks/useQueryGameBalance";
@@ -57,6 +58,8 @@ export default function PetComponent({ pet }: PetDashboardProps) {
   const { mutate: mutateFeedPet, isPending: isFeeding } = useMutateFeedPet();
   const { mutate: mutatePlayWithPet, isPending: isPlaying } =
     useMutatePlayWithPet();
+  const { mutate: mutatePlayAndFeedPet, isPending: isPlayAndFeed } =
+    useMutatePlayAndFeedPet();
   const { mutate: mutateWorkForCoins, isPending: isWorking } =
     useMutateWorkForCoins();
 
@@ -110,7 +113,7 @@ export default function PetComponent({ pet }: PetDashboardProps) {
   // --- Client-side UI Logic & Button Disabling ---
   // `isAnyActionPending` prevents the user from sending multiple transactions at once.
   const isAnyActionPending =
-    isFeeding || isPlaying || isSleeping || isWorking || isLevelingUp;
+    isFeeding || isPlaying || isSleeping || isWorking || isLevelingUp || isPlayAndFeed;
 
   // These `can...` variables mirror the smart contract's rules (`assert!`) on the client-side.
   const canFeed =
@@ -129,7 +132,7 @@ export default function PetComponent({ pet }: PetDashboardProps) {
   const canLevelUp =
     !pet.isSleeping &&
     pet.game_data.experience >=
-      pet.game_data.level * Number(gameBalance.exp_per_level);
+    pet.game_data.level * Number(gameBalance.exp_per_level);
 
   return (
     <TooltipProvider>
@@ -222,6 +225,13 @@ export default function PetComponent({ pet }: PetDashboardProps) {
               disabled={!canPlay || isAnyActionPending}
               isPending={isPlaying}
               label="Play"
+              icon={<PlayIcon />}
+            />
+            <ActionButton
+              onClick={() => mutatePlayAndFeedPet({ petId: pet.id })}
+              disabled={!canPlay || isAnyActionPending}
+              isPending={isPlaying}
+              label="Feed and Play"
               icon={<PlayIcon />}
             />
             <div className="col-span-2">

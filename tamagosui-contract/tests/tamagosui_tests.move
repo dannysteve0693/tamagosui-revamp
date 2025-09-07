@@ -156,7 +156,7 @@ fun test_pet_works() {
 }
 
 #[test]
-#[expected_failure(abort_code = 0x0::tamagosui::E_PET_IS_ASLEEP)]
+#[expected_failure(abort_code = tamagosui::E_PET_IS_ASLEEP)]
 fun test_feed_pet_while_sleeping_should_fail() {
     let mut scenario = test_scenario::begin(USER);
     setup_pet(&mut scenario);
